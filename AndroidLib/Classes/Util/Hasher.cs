@@ -9,68 +9,68 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace RegawMOD
+namespace AndroidLib.Classes.Util
 {
     internal enum HashType
     {
-        MD5,
-        SHA1,
-        SHA256,
-        SHA384,
-        SHA512
+        Md5,
+        Sha1,
+        Sha256,
+        Sha384,
+        Sha512
     }
 
     internal static class Hasher
     {
-        private static StringBuilder builder = new StringBuilder();
+        private static readonly StringBuilder Builder = new StringBuilder();
 
-        internal static string HashFile(string IN_FILE, HashType algo)
+        internal static string HashFile(string inFile, HashType algo)
         {
             byte[] hashBytes = null;
 
             switch (algo)
             {
-                case HashType.MD5:
-                    hashBytes = MD5.Create().ComputeHash(new FileStream(IN_FILE, FileMode.Open));
+                case HashType.Md5:
+                    hashBytes = MD5.Create().ComputeHash(new FileStream(inFile, FileMode.Open));
                     break;
-                case HashType.SHA1:
-                    hashBytes = SHA1.Create().ComputeHash(new FileStream(IN_FILE, FileMode.Open));
+                case HashType.Sha1:
+                    hashBytes = SHA1.Create().ComputeHash(new FileStream(inFile, FileMode.Open));
                     break;
-                case HashType.SHA256:
-                    hashBytes = SHA256.Create().ComputeHash(new FileStream(IN_FILE, FileMode.Open));
+                case HashType.Sha256:
+                    hashBytes = SHA256.Create().ComputeHash(new FileStream(inFile, FileMode.Open));
                     break;
-                case HashType.SHA384:
-                    hashBytes = SHA384.Create().ComputeHash(new FileStream(IN_FILE, FileMode.Open));
+                case HashType.Sha384:
+                    hashBytes = SHA384.Create().ComputeHash(new FileStream(inFile, FileMode.Open));
                     break;
-                case HashType.SHA512:
-                    hashBytes = SHA512.Create().ComputeHash(new FileStream(IN_FILE, FileMode.Open));
+                case HashType.Sha512:
+                    hashBytes = SHA512.Create().ComputeHash(new FileStream(inFile, FileMode.Open));
                     break;
             }
 
             return MakeHashString(hashBytes);
         }
 
-        internal static string HashString(string IN_STRING, HashType algo)
+        internal static string HashString(string inString, HashType algo)
         {
             byte[] inStringBytes = null, hashBytes = null;
 
-            inStringBytes = Encoding.ASCII.GetBytes(IN_STRING);
+            inStringBytes = Encoding.ASCII.GetBytes(inString);
 
             switch (algo)
             {
-                case HashType.MD5:
+                case HashType.Md5:
                     hashBytes = MD5.Create().ComputeHash(inStringBytes);
                     break;
-                case HashType.SHA1:
+                case HashType.Sha1:
                     hashBytes = SHA1.Create().ComputeHash(inStringBytes);
                     break;
-                case HashType.SHA256:
+                case HashType.Sha256:
                     hashBytes = SHA256.Create().ComputeHash(inStringBytes);
                     break;
-                case HashType.SHA384:
-                    hashBytes = SHA384.Create().ComputeHash(inStringBytes); 
+                case HashType.Sha384:
+                    hashBytes = SHA384.Create().ComputeHash(inStringBytes);
                     break;
-                case HashType.SHA512:
+                case HashType.Sha512:
                     hashBytes = SHA512.Create().ComputeHash(inStringBytes);
                     break;
             }
@@ -80,12 +80,12 @@ namespace RegawMOD
 
         private static string MakeHashString(byte[] hash)
         {
-            builder.Remove(0, builder.Length);
+            Builder.Remove(0, Builder.Length);
 
-            foreach (byte b in hash)
-                builder.Append(b.ToString("x2").ToLower());
+            foreach (var b in hash)
+                Builder.Append(b.ToString("x2").ToLower());
 
-            return builder.ToString();
+            return Builder.ToString();
         }
     }
 }

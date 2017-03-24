@@ -4,54 +4,51 @@
 
 using System.IO;
 
-namespace RegawMOD.Android
+namespace AndroidLib.Classes.AndroidController
 {
     /// <summary>
-    /// Contains information about the Su binary on the Android device
+    ///     Contains information about the Su binary on the Android device
     /// </summary>
     public class Su
     {
-        private Device device;
-
-        private string version;
-        private bool exists;
+        private readonly Device _device;
 
         internal Su(Device device)
         {
-            this.device = device;
+            _device = device;
             GetSuData();
         }
 
-        internal bool Exists { get { return this.exists; } }
+        internal bool Exists { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating the version of Su on the Android device
+        ///     Gets a value indicating the version of Su on the Android device
         /// </summary>
-        public string Version { get { return this.version; } }
+        public string Version { get; private set; }
 
         private void GetSuData()
         {
-            if (this.device.State != DeviceState.ONLINE)
+            if (_device.State != DeviceState.Online)
             {
-                this.version = null;
-                this.exists = false;
-                return;     
+                Version = null;
+                Exists = false;
+                return;
             }
-            
-            AdbCommand adbCmd = Adb.FormAdbShellCommand(this.device, false, "su", "-v");
-            using (StringReader r = new StringReader(Adb.ExecuteAdbCommand(adbCmd)))
+
+            var adbCmd = Adb.FormAdbShellCommand(_device, false, "su", "-v");
+            using (var r = new StringReader(Adb.ExecuteAdbCommand(adbCmd)))
             {
-                string line = r.ReadLine();
+                var line = r.ReadLine();
 
                 if (line.Contains("not found") || line.Contains("permission denied"))
                 {
-                    this.version = "-1";
-                    this.exists = false;
+                    Version = "-1";
+                    Exists = false;
                 }
                 else
                 {
-                    this.version = line;
-                    this.exists = true;
+                    Version = line;
+                    Exists = true;
                 }
             }
         }

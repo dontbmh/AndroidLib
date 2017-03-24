@@ -2,45 +2,45 @@
  * Phone.cs - Developed by Dan Wager for AndroidLib.dll
  */
 
-namespace RegawMOD.Android
+namespace AndroidLib.Classes.AndroidController
 {
     /// <summary>
-    /// Controls radio options on an Android device
+    ///     Controls radio options on an Android device
     /// </summary>
     public class Phone
     {
-        private Device device;
+        private readonly Device _device;
 
         internal Phone(Device device)
         {
-            this.device = device;
+            _device = device;
         }
 
         /// <summary>
-        /// Calls a phone number on the Android device
+        ///     Calls a phone number on the Android device
         /// </summary>
         /// <param name="phoneNumber">Phone number to call</param>
         public void CallPhoneNumber(string phoneNumber)
         {
-            if (this.device.State != DeviceState.ONLINE)
+            if (_device.State != DeviceState.Online)
                 return;
 
-            AdbCommand adbCmd = Adb.FormAdbShellCommand(this.device, false, "service", "call", "phone", "2", "s16", phoneNumber);
+            var adbCmd = Adb.FormAdbShellCommand(_device, false, "service", "call", "phone", "2", "s16", phoneNumber);
             Adb.ExecuteAdbCommandNoReturn(adbCmd);
-            adbCmd = Adb.FormAdbShellCommand(this.device, false, "input", "keyevent", (int)KeyEventCode.BACK);
+            adbCmd = Adb.FormAdbShellCommand(_device, false, "input", "keyevent", (int) KeyEventCode.Back);
             Adb.ExecuteAdbCommandNoReturn(adbCmd);
         }
 
         /// <summary>
-        /// Dials (does not call) a phone number on the Android device
+        ///     Dials (does not call) a phone number on the Android device
         /// </summary>
         /// <param name="phoneNumber">Phone number to dial</param>
         public void DialPhoneNumber(string phoneNumber)
         {
-            if (this.device.State != DeviceState.ONLINE)
+            if (_device.State != DeviceState.Online)
                 return;
 
-            AdbCommand adbCmd = Adb.FormAdbShellCommand(this.device, false, "service", "call", "phone", "1", "s16", phoneNumber);
+            var adbCmd = Adb.FormAdbShellCommand(_device, false, "service", "call", "phone", "1", "s16", phoneNumber);
             Adb.ExecuteAdbCommandNoReturn(adbCmd);
         }
 

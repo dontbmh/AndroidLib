@@ -5,15 +5,27 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace RegawMOD
+namespace AndroidLib.Classes.Util
 {
     /// <summary>
-    /// Controls Resource Folders for the <see cref="RegawMOD"/> Namespace
+    ///     Controls Resource Folders for the <see cref="RegawMOD" /> Namespace
     /// </summary>
-    /// <remarks><para>You can use this in your own programs to have a managed resource folder to extract your own files/write data to.</para>
-    /// <para>Calling Unregister() deletes the directory and everything recursively in it, and removes unregisters the directory in the manager.</para></remarks>
-    /// <example><para>This example shows how to register a new directory with the <see cref="ResourceFolderManager"/>, and create a .txt file in the folder.</para>
-    /// <code>//This example shows how to register a new directory named "Testing" and create a file in the folder named "Test1.txt".
+    /// <remarks>
+    ///     <para>
+    ///         You can use this in your own programs to have a managed resource folder to extract your own files/write data
+    ///         to.
+    ///     </para>
+    ///     <para>
+    ///         Calling Unregister() deletes the directory and everything recursively in it, and removes unregisters the
+    ///         directory in the manager.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <para>
+    ///         This example shows how to register a new directory with the <see cref="ResourceFolderManager" />, and create
+    ///         a .txt file in the folder.
+    ///     </para>
+    ///     <code>//This example shows how to register a new directory named "Testing" and create a file in the folder named "Test1.txt".
     /// 
     /// using System;
     /// using System.IO;
@@ -40,74 +52,88 @@ namespace RegawMOD
     /// </example>
     public static class ResourceFolderManager
     {
-        private static readonly DirectoryInfo REGAWMOD_TEMP_DIRECTORY;
-        private static Dictionary<string, DirectoryInfo> controlledFolders;
+        private static readonly DirectoryInfo RegawmodTempDirectory;
+        private static readonly Dictionary<string, DirectoryInfo> ControlledFolders;
 
         static ResourceFolderManager()
         {
-            REGAWMOD_TEMP_DIRECTORY = new DirectoryInfo(Path.GetTempPath() + "\\RegawMOD\\");
-            controlledFolders = new Dictionary<string, DirectoryInfo>();
+            RegawmodTempDirectory = new DirectoryInfo(Path.GetTempPath() + "\\RegawMOD\\");
+            ControlledFolders = new Dictionary<string, DirectoryInfo>();
 
-            if (!REGAWMOD_TEMP_DIRECTORY.Exists)
-                REGAWMOD_TEMP_DIRECTORY.Create();
+            if (!RegawmodTempDirectory.Exists)
+                RegawmodTempDirectory.Create();
 
-            foreach (DirectoryInfo d in REGAWMOD_TEMP_DIRECTORY.GetDirectories("*", SearchOption.TopDirectoryOnly))
-                controlledFolders.Add(d.Name, d);
+            foreach (var d in RegawmodTempDirectory.GetDirectories("*", SearchOption.TopDirectoryOnly))
+                ControlledFolders.Add(d.Name, d);
         }
-        
+
         /// <summary>
-        /// Gets a <see cref="DirectoryInfo"/> containing information about the registered resource directory <paramref name="folder"/>
+        ///     Gets a <see cref="DirectoryInfo" /> containing information about the registered resource directory
+        ///     <paramref name="folder" />
         /// </summary>
         /// <param name="folder">Name of registered resource directory</param>
-        /// <returns><see cref="DirectoryInfo"/> containing information about the registered resource directory <paramref name="folder"/></returns>
+        /// <returns>
+        ///     <see cref="DirectoryInfo" /> containing information about the registered resource directory
+        ///     <paramref name="folder" />
+        /// </returns>
         public static DirectoryInfo GetRegisteredFolder(string folder)
         {
-            return (controlledFolders.ContainsKey(folder) ? controlledFolders[folder] : null);
+            return ControlledFolders.ContainsKey(folder) ? ControlledFolders[folder] : null;
         }
 
         /// <summary>
-        /// Gets the full path of the registered resource directory <paramref name="folder"/>
+        ///     Gets the full path of the registered resource directory <paramref name="folder" />
         /// </summary>
         /// <param name="folder">Name of registered resource directory</param>
-        /// <returns>Full path of the registered resource directory <paramref name="folder"/></returns>
+        /// <returns>Full path of the registered resource directory <paramref name="folder" /></returns>
         public static string GetRegisteredFolderPath(string folder)
         {
-            return (controlledFolders.ContainsKey(folder) ? controlledFolders[folder].FullName : null);
+            return ControlledFolders.ContainsKey(folder) ? ControlledFolders[folder].FullName : null;
         }
 
         /// <summary>
-        /// Registers and creates a temporary resource directory named <paramref name="name"/> with the <see cref="ResourceFolderManager"/>
+        ///     Registers and creates a temporary resource directory named <paramref name="name" /> with the
+        ///     <see cref="ResourceFolderManager" />
         /// </summary>
         /// <param name="name">Name to give to resource directory</param>
         /// <returns>True if creation succeeds, false if directory already exists</returns>
         public static bool Register(string name)
         {
-            if (controlledFolders.ContainsKey(name))
+            if (ControlledFolders.ContainsKey(name))
                 return false;
 
-            controlledFolders.Add(name, new DirectoryInfo(REGAWMOD_TEMP_DIRECTORY + name));
+            ControlledFolders.Add(name, new DirectoryInfo(RegawmodTempDirectory + name));
 
-            if (!controlledFolders[name].Exists)
-                controlledFolders[name].Create();
+            if (!ControlledFolders[name].Exists)
+                ControlledFolders[name].Create();
 
             return true;
         }
 
         /// <summary>
-        /// Unregisters and removes the temporary resource directory defined in <paramref name="name"/> recursively 
+        ///     Unregisters and removes the temporary resource directory defined in <paramref name="name" /> recursively
         /// </summary>
         /// <param name="name">Name of resource directory to unregister</param>
         /// <returns>True if deletion succeeds, false if not</returns>
-        /// <remarks>Make sure all resources in <paramref name="name"/> are not being used by the system at time of Unregister() or it will return false.</remarks>
+        /// <remarks>
+        ///     Make sure all resources in <paramref name="name" /> are not being used by the system at time of Unregister()
+        ///     or it will return false.
+        /// </remarks>
         public static bool Unregister(string name)
         {
-            if (!controlledFolders.ContainsKey(name))
+            if (!ControlledFolders.ContainsKey(name))
                 return false;
 
-            try { controlledFolders[name].Delete(true); }
-            catch { return false; }
+            try
+            {
+                ControlledFolders[name].Delete(true);
+            }
+            catch
+            {
+                return false;
+            }
 
-            return controlledFolders.Remove(name);
+            return ControlledFolders.Remove(name);
         }
     }
 }

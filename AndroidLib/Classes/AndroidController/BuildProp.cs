@@ -4,27 +4,27 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using AndroidLib.Classes.Util;
 
-namespace RegawMOD.Android
+namespace AndroidLib.Classes.AndroidController
 {
     /// <summary>
-    /// Manages all information from connected Android device's build properties
+    ///     Manages all information from connected Android device's build properties
     /// </summary>
     public class BuildProp
     {
-        private Device device;
+        private readonly Device _device;
 
-        private Dictionary<string, string> prop;
+        private readonly Dictionary<string, string> _prop;
 
         internal BuildProp(Device device)
         {
-            this.prop = new Dictionary<string, string>();
-            this.device = device;
+            _prop = new Dictionary<string, string>();
+            _device = device;
         }
 
         /// <summary>
-        /// Gets a <c>List&lt;string&gt;</c> containing all of the device's build proprty keys
+        ///     Gets a <c>List&lt;string&gt;</c> containing all of the device's build proprty keys
         /// </summary>
         public List<string> Keys
         {
@@ -32,9 +32,9 @@ namespace RegawMOD.Android
             {
                 Update();
 
-                List<string> keys = new List<string>();
+                var keys = new List<string>();
 
-                foreach (string key in this.prop.Keys)
+                foreach (var key in _prop.Keys)
                     keys.Add(key);
 
                 return keys;
@@ -42,7 +42,7 @@ namespace RegawMOD.Android
         }
 
         /// <summary>
-        /// Gets a <c>List&lt;string&gt;</c> object containing all of the device's build proprty values
+        ///     Gets a <c>List&lt;string&gt;</c> object containing all of the device's build proprty values
         /// </summary>
         public List<string> Values
         {
@@ -50,9 +50,9 @@ namespace RegawMOD.Android
             {
                 Update();
 
-                List<string> values = new List<string>();
+                var values = new List<string>();
 
-                foreach (string val in this.prop.Values)
+                foreach (var val in _prop.Values)
                     values.Add(val);
 
                 return values;
@@ -60,7 +60,7 @@ namespace RegawMOD.Android
         }
 
         /// <summary>
-        /// Gets the value of the specified build property key.
+        ///     Gets the value of the specified build property key.
         /// </summary>
         /// <param name="key">Key of build property</param>
         /// <returns>Value if key exists, null if key doesn't exist</returns>
@@ -70,50 +70,53 @@ namespace RegawMOD.Android
 
             string tmp;
 
-            this.prop.TryGetValue(key, out tmp);
+            _prop.TryGetValue(key, out tmp);
 
             return tmp;
         }
 
         /// <summary>
-        /// Sets a build property value
+        ///     Sets a build property value
         /// </summary>
-        /// <remarks>If <paramref name="key"/> does not exist or device does not have root, returns false, and does not set any values</remarks>
+        /// <remarks>
+        ///     If <paramref name="key" /> does not exist or device does not have root, returns false, and does not set any
+        ///     values
+        /// </remarks>
         /// <param name="key">Build property key to set</param>
-        /// <param name="newValue">Value you wish to set <paramref name="key"/> to</param>
+        /// <param name="newValue">Value you wish to set <paramref name="key" /> to</param>
         /// <returns>True if new value set, false if not</returns>
         public bool SetProp(string key, string newValue)
         {
             string before;
-            if (!this.prop.TryGetValue(key, out before))
+            if (!_prop.TryGetValue(key, out before))
                 return false;
 
-            if (!this.device.HasRoot)
+            if (!_device.HasRoot)
                 return false;
 
-            AdbCommand adbCmd = Adb.FormAdbShellCommand(this.device, true, "setprop", key, newValue);
+            var adbCmd = Adb.FormAdbShellCommand(_device, true, "setprop", key, newValue);
             Adb.ExecuteAdbCommandNoReturn(adbCmd);
 
             Update();
 
             string after;
-            if (!this.prop.TryGetValue(key, out after))
+            if (!_prop.TryGetValue(key, out after))
                 return false;
 
             return newValue == after;
         }
 
         /// <summary>
-        /// Returns a formatted string containing all of the build properties
+        ///     Returns a formatted string containing all of the build properties
         /// </summary>
         /// <returns>Formatted string containing build.prop</returns>
         public override string ToString()
         {
             Update();
 
-            string outPut = "";
+            var outPut = "";
 
-            foreach (KeyValuePair<string, string> s in this.prop)
+            foreach (var s in _prop)
                 outPut += string.Format("[{0}]: [{1}]" + Environment.NewLine, s.Key, s.Value);
 
             return outPut;
@@ -123,22 +126,22 @@ namespace RegawMOD.Android
         {
             try
             {
-                this.prop.Clear();
+                _prop.Clear();
 
-                if (this.device.State != DeviceState.ONLINE)
+                if (_device.State != DeviceState.Online)
                     return;
 
-                AdbCommand adbCmd = Adb.FormAdbShellCommand(this.device, false, "getprop");
-                string prop = Adb.ExecuteAdbCommand(adbCmd);
+                var adbCmd = Adb.FormAdbShellCommand(_device, false, "getprop");
+                var prop = Adb.ExecuteAdbCommand(adbCmd);
 
-                string[] lines = prop.Split(new string[] { "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var lines = prop.Split(new[] {"\r\n\r\n"}, StringSplitOptions.RemoveEmptyEntries);
 
-                for (int i = 0; i < lines.Length; i++)
+                for (var i = 0; i < lines.Length; i++)
                 {
-                    string[] entry = lines[i].Split(new string[] { "[", "]: [", "]" }, StringSplitOptions.RemoveEmptyEntries);
+                    var entry = lines[i].Split(new[] {"[", "]: [", "]"}, StringSplitOptions.RemoveEmptyEntries);
 
                     if (entry.Length == 2)
-                        this.prop.Add(entry[0], entry[1]);
+                        _prop.Add(entry[0], entry[1]);
                 }
             }
             catch (Exception ex)

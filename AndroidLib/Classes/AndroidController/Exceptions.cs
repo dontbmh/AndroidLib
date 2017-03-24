@@ -4,14 +4,16 @@
 
 using System;
 
-namespace RegawMOD.Android
+namespace AndroidLib.Classes.AndroidController
 {
     /// <summary>
-    /// Thrown when a root shell command is executed on a device without root
+    ///     Thrown when a root shell command is executed on a device without root
     /// </summary>
     /// <remarks>Only created and called internally</remarks>
     public class DeviceHasNoRootException : Exception
     {
-        internal DeviceHasNoRootException() { }
+        internal DeviceHasNoRootException()
+        {
+        }
     }
 }
